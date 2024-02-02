@@ -3,6 +3,8 @@ import os
 import getopt
 import sys
 from AssemblyRecord import AssemblyRecord
+from instruction import instruction
+
 
 def show_help_screen():
 	print("Options:")
@@ -22,6 +24,9 @@ def show_version():
 
 def main():
 	tracefile = "defaulttrace.dat"
+	counter = 0
+	schedulingQ = list()
+
 	try:
 		opts, args = getopt.getopt(sys.argv[1:],"h*:v*:f:",["help", "version", "file="])
 	except getopt.GetoptError:
@@ -41,12 +46,26 @@ def main():
 	print("tracefile:", tracefile)
 	DispatchQueue = AssemblyRecord()
 	DispatchQueue.readAssemblyFile(tracefile)
-	#TODO: The rest of the implementation starts here, 
-	#the Scheduling Queue, 
-	#the Fully functional units and register file (the output file)
-	#The loop here is just a temporary placeholder on fetching stuff from the Dispatch Queue
+	
 	while not DispatchQueue.isEmpty():
-		print (DispatchQueue.removefromlist().getlineofcode())
+		result_token = DispatchQueue.removefromlist().getlineofcode().split()
+		theInstruction = instruction(result_token[0], result_token[1], result_token[2], result_token[3], result_token[4], str(counter))
+		schedulingQ.append(theInstruction.copy())
+		counter += 1
+
+	while schedulingQ:
+		#TODO: The rest of the implementation starts here, 
+		#starting with the scheduling queue which holds a list of instruction objects which include the tags, 
+		#the Fully functional units, Register Objects, and outputfile
+		#The loop here is just a temporary placeholder on fetching stuff from the schedulingQ, 
+		#the schedulingQ is a list of instruction objects
+		schdInst = schedulingQ.pop(0)
+		print ("DEBUG The Schd instruction: ", schdInst.gettag(),
+				schdInst.getpc(), 
+				schdInst.getopt(), 
+				schdInst.getdst(), 
+				schdInst.getsrc1(), 
+				schdInst.getsrc2())
 
 if __name__ == "__main__":
     main()
