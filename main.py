@@ -20,7 +20,7 @@ def show_help_screen():
 
 def show_version():
 	print("Version: 00")
-	print("Revision: 01")
+	print("Revision: 02")
 
 def main():
 	tracefile = "defaulttrace.dat"
