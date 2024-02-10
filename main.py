@@ -53,7 +53,7 @@ def main():
 		schedulingQ.append(theInstruction.copy())
 		counter += 1
 	
-	FunctionUnitQ = AssemblyRecord()
+	FunctionUnitQ = list()
 
 	while schedulingQ:
 		#TODO: The rest of the implementation starts here, 
