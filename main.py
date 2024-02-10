@@ -4,6 +4,7 @@ import getopt
 import sys
 from AssemblyRecord import AssemblyRecord
 from instruction import instruction
+from RegisterClass import Register
 
 
 def show_help_screen():
@@ -28,6 +29,7 @@ def main():
 	DispatchQueue = AssemblyRecord()
 	schedulingQ = list()
 	FunctionUnitQ = AssemblyRecord()
+	registers = Register()
 
 	try:
 		opts, args = getopt.getopt(sys.argv[1:],"h*:v*:f:",["help", "version", "file="])
