@@ -25,7 +25,9 @@ def show_version():
 def main():
 	tracefile = "defaulttrace.dat"
 	counter = 0
+	DispatchQueue = AssemblyRecord()
 	schedulingQ = list()
+	FunctionUnitQ = AssemblyRecord()
 
 	try:
 		opts, args = getopt.getopt(sys.argv[1:],"h*:v*:f:",["help", "version", "file="])
@@ -44,7 +46,6 @@ def main():
 			tracefile = arg
 
 	print("tracefile:", tracefile)
-	DispatchQueue = AssemblyRecord()
 	DispatchQueue.readAssemblyFile(tracefile)
 	
 	while not DispatchQueue.isEmpty():
@@ -52,8 +53,6 @@ def main():
 		theInstruction = instruction(result_token[0], result_token[1], result_token[2], result_token[3], result_token[4], str(counter))
 		schedulingQ.append(theInstruction.copy())
 		counter += 1
-	
-	FunctionUnitQ = list()
 
 	while schedulingQ:
 		#TODO: The rest of the implementation starts here, 
