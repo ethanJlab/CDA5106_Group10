@@ -52,6 +52,8 @@ def main():
 		theInstruction = instruction(result_token[0], result_token[1], result_token[2], result_token[3], result_token[4], str(counter))
 		schedulingQ.append(theInstruction.copy())
 		counter += 1
+	
+	FunctionUnitQ = AssemblyRecord()
 
 	while schedulingQ:
 		#TODO: The rest of the implementation starts here, 
