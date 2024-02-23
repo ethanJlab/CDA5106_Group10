@@ -21,14 +21,15 @@ def show_help_screen():
 
 def show_version():
 	print("Version: 00")
-	print("Revision: 02")
+	print("Revision: 03")
 
 def main():
 	tracefile = "defaulttrace.dat"
 	counter = 0
-	DispatchQueue = AssemblyRecord()
-	schedulingQ = list()
-	FunctionUnitQ = AssemblyRecord()
+	ReadInstructionsQ = AssemblyRecord()
+	DispatchQ = list() # list of instructions in IF or ID state
+	issueQ = list() # list of instructions in IS state (issue state)
+	executeQ = list() # list of instructions in EX state (execute state)
 	registers = Register()
 
 	try:
@@ -48,27 +49,40 @@ def main():
 			tracefile = arg
 
 	print("tracefile:", tracefile)
-	DispatchQueue.readAssemblyFile(tracefile)
+	ReadInstructionsQ.readAssemblyFile(tracefile)
 	
-	while not DispatchQueue.isEmpty():
-		result_token = DispatchQueue.removefromlist().getlineofcode().split()
+	while not ReadInstructionsQ.isEmpty():
+		result_token = ReadInstructionsQ.removefromlist().getlineofcode().split()
 		theInstruction = instruction(result_token[0], result_token[1], result_token[2], result_token[3], result_token[4], str(counter))
-		schedulingQ.append(theInstruction.copy())
+		DispatchQ.append(theInstruction.copy())
 		counter += 1
 
-	while schedulingQ:
+	while DispatchQ: #TODO: This while loop needs to be a bit smarter...
 		#TODO: The rest of the implementation starts here, 
-		#starting with the scheduling queue which holds a list of instruction objects which include the tags, 
-		#the Fully functional units, Register Objects, and outputfile
-		#The loop here is just a temporary placeholder on fetching stuff from the schedulingQ, 
-		#the schedulingQ is a list of instruction objects
-		schdInst = schedulingQ.pop(0)
+
+		#the DispatchQ is a list of instruction objects in IF or ID state.
+		schdInst = DispatchQ.pop(0)
 		print ("DEBUG The Schd instruction: ", schdInst.gettag(),
 				schdInst.getpc(), 
 				schdInst.getopt(), 
 				schdInst.getdst(), 
 				schdInst.getsrc1(), 
-				schdInst.getsrc2())
+				schdInst.getsrc2(), 
+				schdInst.getexecutionstate().getexecutionstate())
+		if schdInst.getexecutionstate().getexecutionstate() == "IF":
+			schdInst.setexecutionstate(1) #progress the state to "ID"
+			DispatchQ.insert(0, schdInst) # and it stays in Dispatch Q
+
+		#TODO: for debug purposes only eventually this continues on to the issue list -> execution list and so on
+		schdInst = DispatchQ.pop(0)
+		print ("DEBUG The modifed Schd instruction poped again: ", schdInst.gettag(),
+				schdInst.getpc(), 
+				schdInst.getopt(), 
+				schdInst.getdst(), 
+				schdInst.getsrc1(), 
+				schdInst.getsrc2(), 
+				schdInst.getexecutionstate().getexecutionstate())
+		
 
 if __name__ == "__main__":
     main()

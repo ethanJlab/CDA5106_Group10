@@ -1,5 +1,6 @@
 import sys
 import copy
+from state import state
 class instruction(object):
 	def __init__(self, pc, opt, dst, src1, src2, tag):
 		self.pc = pc
@@ -8,6 +9,7 @@ class instruction(object):
 		self.src1 = src1
 		self.src2 = src2
 		self.tag = tag
+		self.executionstate = state(0)
 
 	def copy(self):
 		return copy.deepcopy(self)
@@ -29,3 +31,9 @@ class instruction(object):
 
 	def gettag(self):
 		return self.tag
+
+	def setexecutionstate(self, value):
+		self.executionstate.setexecutionstate(value)
+
+	def getexecutionstate(self):
+		return self.executionstate 
