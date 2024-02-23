@@ -28,6 +28,7 @@ def main():
 	counter = 0
 	ReadInstructionsQ = AssemblyRecord()
 	DispatchQ = list() # list of instructions in IF or ID state
+	InstructionsIF = list() # list of instructions in IF state
 	issueQ = list() # list of instructions in IS state (issue state)
 	executeQ = list() # list of instructions in EX state (execute state)
 	registers = Register()
@@ -74,6 +75,7 @@ def main():
 			DispatchQ.insert(0, schdInst) # and it stays in Dispatch Q
 
 		#TODO: for debug purposes only eventually this continues on to the issue list -> execution list and so on
+		# right here I need to go through the first 10 instructions and decide on dependencies and store them in a IF Q
 		schdInst = DispatchQ.pop(0)
 		print ("DEBUG The modifed Schd instruction poped again: ", schdInst.gettag(),
 				schdInst.getpc(), 
