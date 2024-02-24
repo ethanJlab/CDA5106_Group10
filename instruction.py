@@ -9,11 +9,12 @@ class instruction(object):
 		self.src1 = src1
 		self.src2 = src2
 		self.tag = tag
+		self.CurrentState = state(0, 0, 0)
 		self.IFstate = state(0, 0, 0)
-		self.IDstate = state(1, 0, 0)
-		self.ISstate = state(2, 0, 0)
-		self.EXstate = state(3, 0, 0)
-		self.WBstate = state(4, 0, 0)
+		self.IDstate = state(0, 0, 0)
+		self.ISstate = state(0, 0, 0)
+		self.EXstate = state(0, 0, 0)
+		self.WBstate = state(0, 0, 0)
 
 	def copy(self):
 		return copy.deepcopy(self)
@@ -36,33 +37,49 @@ class instruction(object):
 	def gettag(self):
 		return self.tag
 
-	def setIFstate(self, value, cycle, duration):
-		self.IFstate.setexecutionstate(value, cycle, duration)
+	def setCurrentState(self, value, cycle, duration):
+		self.CurrentState.setexecutionstate(value, cycle, duration)
+		if value == 1:
+			self.__setIFstate(value, cycle, duration)
+		elif value == 2:
+			self.__setIDstate(value, cycle, duration)
+		elif value == 3:
+			self.__setISstate(value, cycle, duration)
+		elif value == 4:
+			self.__setEXstate(value, cycle, duration)
+		elif value == 5:
+			self.__setWBstate(value, cycle, duration)
+
+	def getCurrentState(self):
+		return self.CurrentState
 
 	def getIFstate(self):
 		return self.IFstate 
 
-	def setIDstate(self, value, cycle, duration):
-		self.IDstate.setexecutionstate(value, cycle, duration)
-
 	def getIDstate(self):
 		return self.IDstate 
-
-	def setISstate(self, value, cycle, duration):
-		self.ISstate.setexecutionstate(value, cycle, duration)
 
 	def getISstate(self):
 		return self.ISstate 
 
-	def setEXstate(self, value, cycle, duration):
-		self.EXstate.setexecutionstate(value, cycle, duration)
-
 	def getEXstate(self):
 		return self.EXstate 
 
-	def setWBstate(self, value, cycle, duration):
-		self.WBstate.setexecutionstate(value, cycle, duration)
-
 	def getWBstate(self):
 		return self.WBstate 
+
+	def __setIFstate(self, value, cycle, duration):
+		self.IFstate.setexecutionstate(value, cycle, duration)
+
+	def __setIDstate(self, value, cycle, duration):
+		self.IDstate.setexecutionstate(value, cycle, duration)
+
+	def __setISstate(self, value, cycle, duration):
+		self.ISstate.setexecutionstate(value, cycle, duration)
+
+	def __setEXstate(self, value, cycle, duration):
+		self.EXstate.setexecutionstate(value, cycle, duration)
+
+	def __setWBstate(self, value, cycle, duration):
+		self.WBstate.setexecutionstate(value, cycle, duration)
 

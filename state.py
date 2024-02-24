@@ -7,7 +7,7 @@ import copy
 # WB: Write Back
 class state(object):
 	def __init__(self, initstate, cyclep, durationp):
-		self.executionstates = ["IF", "ID", "IS", "EX", "WB"]
+		self.executionstates = ["NA", "IF", "ID", "IS", "EX", "WB"]
 		self.executionstate = self.executionstates[initstate]
 		self.cycle = cyclep
 		self.duration = durationp

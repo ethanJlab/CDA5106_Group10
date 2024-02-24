@@ -27,9 +27,10 @@ def main():
 	tracefile = "defaulttrace.dat"
 	counter = 0
 	cyclecounter = 0
+	durationcounter = 0
 	ReadInstructionsQ = AssemblyRecord()
+	ROB = list() # list of instructions
 	DispatchQ = list() # list of instructions in IF or ID state
-	InstructionsIF = list() # list of instructions in IF state
 	issueQ = list() # list of instructions in IS state (issue state)
 	executeQ = list() # list of instructions in EX state (execute state)
 	registers = Register()
@@ -57,51 +58,98 @@ def main():
 	while not ReadInstructionsQ.isEmpty():
 		result_token = ReadInstructionsQ.removefromlist().getlineofcode().split()
 		theInstruction = instruction(result_token[0], result_token[1], result_token[2], result_token[3], result_token[4], str(counter))
-		DispatchQ.append(theInstruction.copy())
+		ROB.append(theInstruction.copy())
 		counter += 1
 
-	while DispatchQ: #TODO: This while loop needs to be a bit smarter...
+	while ROB or DispatchQ: #do
 		#TODO: The rest of the implementation starts here, 
 
 		#the DispatchQ is a list of instruction objects in IF or ID state.
+		if DispatchQ:
+			dcounter = 0
+			while dcounter < len(DispatchQ):
+				schdInst = DispatchQ.pop(dcounter)
+				if schdInst.getCurrentState().getexecutionstate() == "IF":
+					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
+					print ("DEBUG Pop DispatchQ: ", schdInst.gettag(),
+						schdInst.getpc(), 
+						schdInst.getopt(), 
+						schdInst.getdst(), 
+						schdInst.getsrc1(), 
+						schdInst.getsrc2(), 
+						schdInst.getIFstate().getexecutionstate(), 
+						schdInst.getIFstate().getcycle(),
+						schdInst.getIFstate().getduration(), 
+						schdInst.getIDstate().getexecutionstate(), 
+						schdInst.getIDstate().getcycle(),
+						schdInst.getIDstate().getduration(),
+						schdInst.getISstate().getexecutionstate(), 
+						schdInst.getISstate().getcycle(),
+						schdInst.getISstate().getduration(),
+						schdInst.getEXstate().getexecutionstate(), 
+						schdInst.getEXstate().getcycle(),
+						schdInst.getEXstate().getduration(),
+						schdInst.getWBstate().getexecutionstate(), 
+						schdInst.getWBstate().getcycle(),
+						schdInst.getWBstate().getduration())
+					DispatchQ.insert(dcounter, schdInst.copy())
+					dcounter += 1
+				else:
+					schdInst.setCurrentState(3, cyclecounter, durationcounter) # else assign IS state
+					print ("DEBUG Pop DispatchQ IS state: ", schdInst.gettag(),
+						schdInst.getpc(), 
+						schdInst.getopt(), 
+						schdInst.getdst(), 
+						schdInst.getsrc1(), 
+						schdInst.getsrc2(), 
+						schdInst.getIFstate().getexecutionstate(), 
+						schdInst.getIFstate().getcycle(),
+						schdInst.getIFstate().getduration(), 
+						schdInst.getIDstate().getexecutionstate(), 
+						schdInst.getIDstate().getcycle(),
+						schdInst.getIDstate().getduration(),
+						schdInst.getISstate().getexecutionstate(), 
+						schdInst.getISstate().getcycle(),
+						schdInst.getISstate().getduration(),
+						schdInst.getEXstate().getexecutionstate(), 
+						schdInst.getEXstate().getcycle(),
+						schdInst.getEXstate().getduration(),
+						schdInst.getWBstate().getexecutionstate(), 
+						schdInst.getWBstate().getcycle(),
+						schdInst.getWBstate().getduration())
+					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue					
+	
+				durationcounter += 1
+		else:
+			print ("DispatchQ is currently empty at cycle " + str(cyclecounter))
+			print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
+
+
 		lcounter = 0
 		while dispatchbool:
-			schdInst = DispatchQ.pop(lcounter)
-			schdInst.setIFstate(0, cyclecounter, lcounter) #FIXME: I think duration lcounter! totally needs fixing.
-			
-			DispatchQ.insert(lcounter, schdInst.copy()) #place modified instruction back in DispatchQ
-			if lcounter == 7:
-				dispatchbool = False
+			if ROB:
+				schdInst = ROB.pop(0)
+				schdInst.setCurrentState(1, cyclecounter, lcounter) #FIXME: I think duration lcounter! totally needs fixing.
+				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
+				
+				if lcounter == 7:
+					dispatchbool = False
+				else:
+					dispatchbool = True
+	
 			else:
-				dispatchbool = True
-
+				print ("nothing to pop from ROB")
+				print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
+				print ("DEBUG listLength of issueQ = " + str(len(issueQ)) + " Cycle number = " + str(cyclecounter))
+				break # once ROB is empty, this is the "while" part of the do .. while
+			
 			lcounter += 1
-		
-		#TODO: DEBUG code only
-		schdInst = DispatchQ.pop(0)
-		print ("DEBUG The modifed Schd instruction: ", schdInst.gettag(),
-				schdInst.getpc(), 
-				schdInst.getopt(), 
-				schdInst.getdst(), 
-				schdInst.getsrc1(), 
-				schdInst.getsrc2(), 
-				schdInst.getIFstate().getexecutionstate(), 
-				schdInst.getIFstate().getcycle(),
-				schdInst.getIFstate().getduration(), 
-				schdInst.getIDstate().getexecutionstate(), 
-				schdInst.getIDstate().getcycle(),
-				schdInst.getIDstate().getduration(),
-				schdInst.getISstate().getexecutionstate(), 
-				schdInst.getISstate().getcycle(),
-				schdInst.getISstate().getduration(),
-				schdInst.getEXstate().getexecutionstate(), 
-				schdInst.getEXstate().getcycle(),
-				schdInst.getEXstate().getduration(),
-				schdInst.getWBstate().getexecutionstate(), 
-				schdInst.getWBstate().getcycle(),
-				schdInst.getWBstate().getduration())
+			durationcounter += 1
 
+		dispatchbool = True #reset dispatchbool
 		cyclecounter += 1 # advance the cycle.
+		durationcounter += 1
+		# END while ROB
 		
 
 if __name__ == "__main__":
