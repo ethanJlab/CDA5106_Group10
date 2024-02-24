@@ -6,9 +6,11 @@ import copy
 # EX: Execute
 # WB: Write Back
 class state(object):
-	def __init__(self, initstate):
+	def __init__(self, initstate, cyclep, durationp):
 		self.executionstates = ["IF", "ID", "IS", "EX", "WB"]
-		self.executionstate = self.executionstates[0]
+		self.executionstate = self.executionstates[initstate]
+		self.cycle = cyclep
+		self.duration = durationp
 
 	def copy(self):
 		return copy.deepcopy(self)
@@ -16,6 +18,20 @@ class state(object):
 	def getexecutionstate(self):
 		return self.executionstate
 
-	def setexecutionstate(self, thestate):
+	def setexecutionstate(self, thestate, thecycle, theduration):
 		self.executionstate = self.executionstates[thestate]
+		self.cycle = thecycle
+		self.duration = theduration
+
+	def setcycle(self, thecycle):
+		self.cycle = thecycle
+
+	def getcycle(self):
+		return self.cycle
+
+	def setduration(self, theduration):
+		self.duration = theduration
+
+	def getduration(self):
+		return self.duration
 
