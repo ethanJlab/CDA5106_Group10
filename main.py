@@ -129,7 +129,7 @@ def main():
 		while dispatchbool:
 			if ROB:
 				schdInst = ROB.pop(0)
-				schdInst.setCurrentState(1, cyclecounter, lcounter) #FIXME: I think duration lcounter! totally needs fixing.
+				schdInst.setCurrentState(1, cyclecounter, lcounter)
 				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
 
 				# The operation type of an instruction indicates its execution latency
