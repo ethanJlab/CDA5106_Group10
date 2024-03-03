@@ -141,7 +141,8 @@ def main():
 					lcounter += 5
 				
 				# the maximum amount of instructions that can be dispatched in one cycle is 8
-				if lcounter >= 7:
+				maxDispatch = 8
+				if lcounter >= maxDispatch - 1:
 					dispatchbool = False
 				else:
 					dispatchbool = True
