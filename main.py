@@ -131,8 +131,17 @@ def main():
 				schdInst = ROB.pop(0)
 				schdInst.setCurrentState(1, cyclecounter, lcounter) #FIXME: I think duration lcounter! totally needs fixing.
 				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
+
+				# The operation type of an instruction indicates its execution latency
+				if schdInst.getopt() == "0": # Type 0 has a letency of 1 cycle
+					lcounter += 1
+				elif schdInst.getopt() == "1": # Type 1 has a letency of 2 cycles
+					lcounter += 2
+				elif schdInst.getopt() == "2": # Type 2 has a letency of 5 cycles
+					lcounter += 5
 				
-				if lcounter == 7:
+				# the maximum amount of instructions that can be dispatched in one cycle is 8
+				if lcounter >= 7:
 					dispatchbool = False
 				else:
 					dispatchbool = True
@@ -144,7 +153,7 @@ def main():
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
 			lcounter += 1
-			durationcounter += 1
+			# durationcounter += 1
 
 		dispatchbool = True #reset dispatchbool
 		cyclecounter += 1 # advance the cycle.
