@@ -133,11 +133,11 @@ def main():
 				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
 
 				# The operation type of an instruction indicates its execution latency
-				if schdInst.getopt() == "0": # Type 0 has a letency of 1 cycle
+				if schdInst.getopt() == "0": # Type 0 has a latency of 1 cycle
 					lcounter += 1
-				elif schdInst.getopt() == "1": # Type 1 has a letency of 2 cycles
+				elif schdInst.getopt() == "1": # Type 1 has a latency of 2 cycles
 					lcounter += 2
-				elif schdInst.getopt() == "2": # Type 2 has a letency of 5 cycles
+				elif schdInst.getopt() == "2": # Type 2 has a latency of 5 cycles
 					lcounter += 5
 				
 				# the maximum amount of instructions that can be dispatched in one cycle is 8
