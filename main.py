@@ -23,6 +23,31 @@ def show_version():
 	print("Version: 00")
 	print("Revision: 03")
 
+# General function to print the state of the instruction
+def print_schdInst(message, schdInst):
+    print(message,
+          schdInst.gettag(),
+          schdInst.getpc(),
+          schdInst.getopt(),
+          schdInst.getdst(),
+          schdInst.getsrc1(),
+          schdInst.getsrc2(),
+          schdInst.getIFstate().getexecutionstate(),
+          schdInst.getIFstate().getcycle(),
+          schdInst.getIFstate().getduration(),
+          schdInst.getIDstate().getexecutionstate(),
+          schdInst.getIDstate().getcycle(),
+          schdInst.getIDstate().getduration(),
+          schdInst.getISstate().getexecutionstate(),
+          schdInst.getISstate().getcycle(),
+          schdInst.getISstate().getduration(),
+          schdInst.getEXstate().getexecutionstate(),
+          schdInst.getEXstate().getcycle(),
+          schdInst.getEXstate().getduration(),
+          schdInst.getWBstate().getexecutionstate(),
+          schdInst.getWBstate().getcycle(),
+          schdInst.getWBstate().getduration())
+
 def main():
 	tracefile = "defaulttrace.dat"
 	counter = 0
@@ -71,52 +96,12 @@ def main():
 				schdInst = DispatchQ.pop(dcounter)
 				if schdInst.getCurrentState().getexecutionstate() == "IF":
 					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
-					print ("DEBUG Pop DispatchQ: ", schdInst.gettag(),
-						schdInst.getpc(), 
-						schdInst.getopt(), 
-						schdInst.getdst(), 
-						schdInst.getsrc1(), 
-						schdInst.getsrc2(), 
-						schdInst.getIFstate().getexecutionstate(), 
-						schdInst.getIFstate().getcycle(),
-						schdInst.getIFstate().getduration(), 
-						schdInst.getIDstate().getexecutionstate(), 
-						schdInst.getIDstate().getcycle(),
-						schdInst.getIDstate().getduration(),
-						schdInst.getISstate().getexecutionstate(), 
-						schdInst.getISstate().getcycle(),
-						schdInst.getISstate().getduration(),
-						schdInst.getEXstate().getexecutionstate(), 
-						schdInst.getEXstate().getcycle(),
-						schdInst.getEXstate().getduration(),
-						schdInst.getWBstate().getexecutionstate(), 
-						schdInst.getWBstate().getcycle(),
-						schdInst.getWBstate().getduration())
+					print_schdInst("DEBUG Pop DispatchQ: ", schdInst)
 					DispatchQ.insert(dcounter, schdInst.copy())
 					dcounter += 1
 				else:
 					schdInst.setCurrentState(3, cyclecounter, durationcounter) # else assign IS state
-					print ("DEBUG Pop DispatchQ IS state: ", schdInst.gettag(),
-						schdInst.getpc(), 
-						schdInst.getopt(), 
-						schdInst.getdst(), 
-						schdInst.getsrc1(), 
-						schdInst.getsrc2(), 
-						schdInst.getIFstate().getexecutionstate(), 
-						schdInst.getIFstate().getcycle(),
-						schdInst.getIFstate().getduration(), 
-						schdInst.getIDstate().getexecutionstate(), 
-						schdInst.getIDstate().getcycle(),
-						schdInst.getIDstate().getduration(),
-						schdInst.getISstate().getexecutionstate(), 
-						schdInst.getISstate().getcycle(),
-						schdInst.getISstate().getduration(),
-						schdInst.getEXstate().getexecutionstate(), 
-						schdInst.getEXstate().getcycle(),
-						schdInst.getEXstate().getduration(),
-						schdInst.getWBstate().getexecutionstate(), 
-						schdInst.getWBstate().getcycle(),
-						schdInst.getWBstate().getduration())
+					print_schdInst("DEBUG Pop DispatchQ IS state: ", schdInst)
 					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue					
 	
 				durationcounter += 1
