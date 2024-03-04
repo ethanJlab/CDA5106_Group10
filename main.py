@@ -154,7 +154,7 @@ def main():
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
 			lcounter += 1
-			# durationcounter += 1
+			durationcounter += 1 # Should this increment be here or outside the while loop or both?
 
 		dispatchbool = True #reset dispatchbool
 		cyclecounter += 1 # advance the cycle.
