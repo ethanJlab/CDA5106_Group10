@@ -23,6 +23,31 @@ def show_version():
 	print("Version: 00")
 	print("Revision: 03")
 
+# General function to print the state of the instruction
+def print_schdInst(message, schdInst):
+    print(message,
+          schdInst.gettag(),
+          schdInst.getpc(),
+          schdInst.getopt(),
+          schdInst.getdst(),
+          schdInst.getsrc1(),
+          schdInst.getsrc2(),
+          schdInst.getIFstate().getexecutionstate(),
+          schdInst.getIFstate().getcycle(),
+          schdInst.getIFstate().getduration(),
+          schdInst.getIDstate().getexecutionstate(),
+          schdInst.getIDstate().getcycle(),
+          schdInst.getIDstate().getduration(),
+          schdInst.getISstate().getexecutionstate(),
+          schdInst.getISstate().getcycle(),
+          schdInst.getISstate().getduration(),
+          schdInst.getEXstate().getexecutionstate(),
+          schdInst.getEXstate().getcycle(),
+          schdInst.getEXstate().getduration(),
+          schdInst.getWBstate().getexecutionstate(),
+          schdInst.getWBstate().getcycle(),
+          schdInst.getWBstate().getduration())
+
 def main():
 	tracefile = "defaulttrace.dat"
 	counter = 0
@@ -71,52 +96,12 @@ def main():
 				schdInst = DispatchQ.pop(dcounter)
 				if schdInst.getCurrentState().getexecutionstate() == "IF":
 					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
-					print ("DEBUG Pop DispatchQ: ", schdInst.gettag(),
-						schdInst.getpc(), 
-						schdInst.getopt(), 
-						schdInst.getdst(), 
-						schdInst.getsrc1(), 
-						schdInst.getsrc2(), 
-						schdInst.getIFstate().getexecutionstate(), 
-						schdInst.getIFstate().getcycle(),
-						schdInst.getIFstate().getduration(), 
-						schdInst.getIDstate().getexecutionstate(), 
-						schdInst.getIDstate().getcycle(),
-						schdInst.getIDstate().getduration(),
-						schdInst.getISstate().getexecutionstate(), 
-						schdInst.getISstate().getcycle(),
-						schdInst.getISstate().getduration(),
-						schdInst.getEXstate().getexecutionstate(), 
-						schdInst.getEXstate().getcycle(),
-						schdInst.getEXstate().getduration(),
-						schdInst.getWBstate().getexecutionstate(), 
-						schdInst.getWBstate().getcycle(),
-						schdInst.getWBstate().getduration())
+					print_schdInst("DEBUG Pop DispatchQ: ", schdInst)
 					DispatchQ.insert(dcounter, schdInst.copy())
 					dcounter += 1
 				else:
 					schdInst.setCurrentState(3, cyclecounter, durationcounter) # else assign IS state
-					print ("DEBUG Pop DispatchQ IS state: ", schdInst.gettag(),
-						schdInst.getpc(), 
-						schdInst.getopt(), 
-						schdInst.getdst(), 
-						schdInst.getsrc1(), 
-						schdInst.getsrc2(), 
-						schdInst.getIFstate().getexecutionstate(), 
-						schdInst.getIFstate().getcycle(),
-						schdInst.getIFstate().getduration(), 
-						schdInst.getIDstate().getexecutionstate(), 
-						schdInst.getIDstate().getcycle(),
-						schdInst.getIDstate().getduration(),
-						schdInst.getISstate().getexecutionstate(), 
-						schdInst.getISstate().getcycle(),
-						schdInst.getISstate().getduration(),
-						schdInst.getEXstate().getexecutionstate(), 
-						schdInst.getEXstate().getcycle(),
-						schdInst.getEXstate().getduration(),
-						schdInst.getWBstate().getexecutionstate(), 
-						schdInst.getWBstate().getcycle(),
-						schdInst.getWBstate().getduration())
+					print_schdInst("DEBUG Pop DispatchQ IS state: ", schdInst)
 					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue					
 	
 				durationcounter += 1
@@ -129,10 +114,20 @@ def main():
 		while dispatchbool:
 			if ROB:
 				schdInst = ROB.pop(0)
-				schdInst.setCurrentState(1, cyclecounter, lcounter) #FIXME: I think duration lcounter! totally needs fixing.
+				schdInst.setCurrentState(1, cyclecounter, lcounter)
 				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
+
+				# The operation type of an instruction indicates its execution latency
+				if schdInst.getopt() == "0": # Type 0 has a latency of 1 cycle
+					lcounter += 1
+				elif schdInst.getopt() == "1": # Type 1 has a latency of 2 cycles
+					lcounter += 2
+				elif schdInst.getopt() == "2": # Type 2 has a latency of 5 cycles
+					lcounter += 5
 				
-				if lcounter == 7:
+				# the maximum amount of instructions that can be dispatched in one cycle is 8
+				maxDispatch = 8
+				if lcounter >= maxDispatch - 1:
 					dispatchbool = False
 				else:
 					dispatchbool = True
@@ -144,7 +139,7 @@ def main():
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
 			lcounter += 1
-			durationcounter += 1
+			durationcounter += 1 # Should this increment be here or outside the while loop or both?
 
 		dispatchbool = True #reset dispatchbool
 		cyclecounter += 1 # advance the cycle.
