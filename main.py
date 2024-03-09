@@ -21,8 +21,8 @@ def show_help_screen():
 	print('')
 
 def show_version():
-	print("Version: 00")
-	print("Revision: 05")
+	print("Version: 01")
+	print("Revision: 00")
 
 # General function to print the state of the instruction
 def print_schdInst(message, schdInst):
