@@ -66,7 +66,23 @@ class instruction(object):
 		return self.EXstate 
 
 	def getWBstate(self):
-		return self.WBstate 
+		return self.WBstate
+
+	def WriteToFile(self, Output):
+		spacestr = " "
+		commastr = ","
+		writestr = (self.tag + spacestr + "fu{" + self.opt + "}" + 
+					spacestr + "src{" + self.src1 + commastr + self.src2 + "}" + spacestr + 
+					"dst{" + self.dst + "}" + spacestr + 
+					"IF{" + str(self.IFstate.getcycle()) + commastr + str(self.IFstate.getduration()) + "}" + spacestr +
+					"ID{" + str(self.IDstate.getcycle()) + commastr + str(self.IDstate.getduration()) + "}" + spacestr +
+					"IS{" + str(self.ISstate.getcycle()) + commastr + str(self.ISstate.getduration()) + "}" + spacestr +
+					"EX{" + str(self.EXstate.getcycle()) + commastr + str(self.EXstate.getduration()) + "}" + spacestr +
+					"WB{" + str(self.WBstate.getcycle()) + commastr + str(self.WBstate.getduration()) + "}" + spacestr)
+		writestr = writestr + "\n"
+		Output.write(writestr)
+
+	# private members:
 
 	def __setIFstate(self, value, cycle, duration):
 		self.IFstate.setexecutionstate(value, cycle, duration)

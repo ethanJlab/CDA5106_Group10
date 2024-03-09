@@ -21,7 +21,7 @@ class state(object):
 	def setexecutionstate(self, thestate, thecycle, theduration):
 		self.executionstate = self.executionstates[thestate]
 		self.cycle = thecycle
-		self.duration = theduration
+		self.duration = self.duration + theduration
 
 	def setcycle(self, thecycle):
 		self.cycle = thecycle

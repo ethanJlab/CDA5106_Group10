@@ -5,6 +5,7 @@ import sys
 from AssemblyRecord import AssemblyRecord
 from instruction import instruction
 from RegisterClass import Register
+from FinalStateOfIns import FinalStateOfIns
 
 
 def show_help_screen():
@@ -21,7 +22,7 @@ def show_help_screen():
 
 def show_version():
 	print("Version: 00")
-	print("Revision: 04")
+	print("Revision: 05")
 
 # General function to print the state of the instruction
 def print_schdInst(message, schdInst):
@@ -54,6 +55,7 @@ def main():
 	cyclecounter = 0
 	durationcounter = 0
 	ReadInstructionsQ = AssemblyRecord()
+	FinalStateOfInstructions = FinalStateOfIns()
 	ROB = list() # list of instructions
 	DispatchQ = list() # list of instructions in IF or ID state
 	issueQ = list() # list of instructions in IS state (issue state)
@@ -86,8 +88,20 @@ def main():
 		ROB.append(theInstruction.copy())
 		counter += 1
 
-	while ROB or DispatchQ: #do
-		#TODO: The rest of the implementation starts here, 
+	while ROB or DispatchQ or issueQ or executeQ: #do
+		durationcounter = 0
+		while executeQ:
+			schdInst = executeQ.pop(0)
+			print_schdInst("Debug Pop executeQ: ", schdInst)
+			schdInst.setCurrentState(5, cyclecounter, durationcounter)
+			FinalStateOfInstructions.addtolist(schdInst.copy())
+			durationcounter += 1
+		while issueQ:
+			schdInst = issueQ.pop(0)
+			print_schdInst("DEBUG Pop issueQ: ", schdInst)
+			schdInst.setCurrentState(4, cyclecounter, durationcounter)
+			durationcounter += 1
+			executeQ.append(schdInst.copy()) #place in execute Q
 
 		#the DispatchQ is a list of instruction objects in IF or ID state.
 		if DispatchQ:
@@ -97,14 +111,14 @@ def main():
 				if schdInst.getCurrentState().getexecutionstate() == "IF":
 					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
 					print_schdInst("DEBUG Pop DispatchQ: ", schdInst)
-					DispatchQ.insert(dcounter, schdInst.copy())
+					DispatchQ.insert(dcounter, schdInst.copy()) # and place it back
 					dcounter += 1
 				else:
 					schdInst.setCurrentState(3, cyclecounter, durationcounter) # else assign IS state
 					print_schdInst("DEBUG Pop DispatchQ IS state: ", schdInst)
 					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue					
 	
-				durationcounter += 1
+				durationcounter += 1 # increment duration again, because we are still doing stuff
 		else:
 			print ("DispatchQ is currently empty at cycle " + str(cyclecounter))
 			print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
@@ -139,13 +153,14 @@ def main():
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
 			lcounter += 1
-			durationcounter += 1 # Should this increment be here or outside the while loop or both?
+			durationcounter += 1 # duration should be here as well as in the outside loop, because we are measuring 
+									# how long we are here executing.
 
 		dispatchbool = True #reset dispatchbool
 		cyclecounter += 1 # advance the cycle.
-		durationcounter += 1
 		# END while ROB
-		
+
+	FinalStateOfInstructions.WriteToFile("output.txt")		
 
 if __name__ == "__main__":
     main()
