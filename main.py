@@ -49,7 +49,7 @@ def print_schdInst(message, schdInst):
           schdInst.getWBstate().getduration())
 
 def main():
-	tracefile = "defaulttrace.dat"
+	tracefile = "tracefile.dat"
 	counter = 0
 	cyclecounter = 0
 	durationcounter = 0
