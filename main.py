@@ -54,6 +54,11 @@ def main():
 	counter = 0
 	cyclecounter = 0
 	durationcounter = 0
+
+	#TODO: maxScheduleQSize and maxDispatch should be read as input
+	maxScheduleQSize = 2
+	maxDispatch = 8
+	
 	ReadInstructionsQ = AssemblyRecord()
 	FinalStateOfInstructions = FinalStateOfIns()
 	ROB = list() # list of instructions
@@ -96,7 +101,7 @@ def main():
 			schdInst.setCurrentState(5, cyclecounter, durationcounter)
 			FinalStateOfInstructions.addtolist(schdInst.copy())
 			durationcounter += 1
-		while issueQ:
+		while issueQ and len(executeQ) <= maxScheduleQSize:
 			schdInst = issueQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
@@ -106,7 +111,7 @@ def main():
 		#the DispatchQ is a list of instruction objects in IF or ID state.
 		if DispatchQ:
 			dcounter = 0
-			while dcounter < len(DispatchQ):
+			while dcounter < len(DispatchQ) and len(issueQ) <= maxScheduleQSize:
 				schdInst = DispatchQ.pop(dcounter)
 				if schdInst.getCurrentState().getexecutionstate() == "IF":
 					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
@@ -119,6 +124,7 @@ def main():
 					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue					
 	
 				durationcounter += 1 # increment duration again, because we are still doing stuff
+				
 		else:
 			print ("DispatchQ is currently empty at cycle " + str(cyclecounter))
 			print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
@@ -139,9 +145,8 @@ def main():
 				elif schdInst.getopt() == "2": # Type 2 has a latency of 5 cycles
 					lcounter += 5
 				
-				# the maximum amount of instructions that can be dispatched in one cycle is 8
-				maxDispatch = 8
-				if lcounter >= maxDispatch - 1:
+				# the maximum amount of instructions that can be dispatched in one cycle is 8				
+				if lcounter >= maxDispatch:
 					dispatchbool = False
 				else:
 					dispatchbool = True
@@ -152,6 +157,7 @@ def main():
 				print ("DEBUG listLength of issueQ = " + str(len(issueQ)) + " Cycle number = " + str(cyclecounter))
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
+			#cyclecounter += 1
 			lcounter += 1
 			durationcounter += 1 # duration should be here as well as in the outside loop, because we are measuring 
 									# how long we are here executing.
