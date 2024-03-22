@@ -95,12 +95,16 @@ def main():
 
 	while ROB or DispatchQ or issueQ or executeQ: #do
 		durationcounter = 0
+		exePopCounter = 0
 		while executeQ:
-			schdInst = executeQ.pop(0)
-			print_schdInst("Debug Pop executeQ: ", schdInst)
-			schdInst.setCurrentState(5, cyclecounter, durationcounter)
-			FinalStateOfInstructions.addtolist(schdInst.copy())
-			durationcounter += 1
+			# this while loop simulates have n number of FUs, where n is the maxDispatch
+			while executeQ and exePopCounter <= maxDispatch: 
+				schdInst = executeQ.pop(0)
+				print_schdInst("Debug Pop executeQ: ", schdInst)
+				schdInst.setCurrentState(5, cyclecounter, durationcounter)
+				FinalStateOfInstructions.addtolist(schdInst.copy())
+				durationcounter += 1
+			cyclecounter += 1						
 		while issueQ and len(executeQ) <= maxScheduleQSize:
 			schdInst = issueQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
@@ -157,13 +161,13 @@ def main():
 				print ("DEBUG listLength of issueQ = " + str(len(issueQ)) + " Cycle number = " + str(cyclecounter))
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
-			#cyclecounter += 1
+			cyclecounter += 1
 			lcounter += 1
 			durationcounter += 1 # duration should be here as well as in the outside loop, because we are measuring 
 									# how long we are here executing.
 
 		dispatchbool = True #reset dispatchbool
-		cyclecounter += 1 # advance the cycle.
+		#cyclecounter -= 1 # advance the cycle.
 		# END while ROB
 
 	FinalStateOfInstructions.WriteToFile("output.txt")		
