@@ -148,7 +148,8 @@ def main():
 				elif schdInst.getopt() == "2": # Type 2 has a latency of 5 cycles
 					lcounter += 5
 				
-				# the maximum amount of instructions that can be dispatched in one cycle is 8				
+				# the maximum amount of instructions that can be dispatched in one cycle is n + 1
+				# Max length of DispatchQ is 2n			
 				if lcounter >= maxDispatch or len(DispatchQ) >= 2*maxDispatch:
 					dispatchbool = False
 					cyclecounter += 1
