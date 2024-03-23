@@ -150,7 +150,7 @@ def main():
 				
 				# the maximum amount of instructions that can be dispatched in one cycle is n + 1
 				# Max length of DispatchQ is 2n			
-				if lcounter >= maxDispatch or len(DispatchQ) >= 2*maxDispatch:
+				if lcounter >= maxDispatch or len(DispatchQ) >= maxDispatch:
 					dispatchbool = False
 					cyclecounter += 1
 				else:
