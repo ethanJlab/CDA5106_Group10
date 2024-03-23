@@ -95,22 +95,21 @@ def main():
 
 	while ROB or DispatchQ or issueQ or executeQ: #do
 		durationcounter = 0
-		exePopCounter = 0
-		while executeQ:
-			# this while loop simulates have n number of FUs, where n is the maxDispatch
-			while executeQ and exePopCounter <= maxDispatch: 
-				schdInst = executeQ.pop(0)
-				print_schdInst("Debug Pop executeQ: ", schdInst)
-				schdInst.setCurrentState(5, cyclecounter, durationcounter)
-				FinalStateOfInstructions.addtolist(schdInst.copy())
-				durationcounter += 1
-			cyclecounter += 1						
-		while issueQ and len(executeQ) <= maxScheduleQSize:
+		while executeQ: 
+			schdInst = executeQ.pop(0)
+			print_schdInst("Debug Pop executeQ: ", schdInst)
+			schdInst.setCurrentState(5, cyclecounter, durationcounter)
+			FinalStateOfInstructions.addtolist(schdInst.copy())
+			durationcounter += 1
+			#cyclecounter += 1
+		# Scan the READY instructions and issue up to N+1 of them						
+		while issueQ and len(executeQ) < maxScheduleQSize + 1:
 			schdInst = issueQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
 			durationcounter += 1
 			executeQ.append(schdInst.copy()) #place in execute Q
+		#cyclecounter += 1
 
 		#the DispatchQ is a list of instruction objects in IF or ID state.
 		if DispatchQ:
@@ -138,7 +137,7 @@ def main():
 		while dispatchbool:
 			if ROB:
 				schdInst = ROB.pop(0)
-				schdInst.setCurrentState(1, cyclecounter, lcounter)
+				schdInst.setCurrentState(1, cyclecounter, lcounter) # set to the IF state
 				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
 
 				# The operation type of an instruction indicates its execution latency
@@ -150,8 +149,9 @@ def main():
 					lcounter += 5
 				
 				# the maximum amount of instructions that can be dispatched in one cycle is 8				
-				if lcounter >= maxDispatch:
+				if lcounter >= maxDispatch or len(DispatchQ) >= 2*maxDispatch:
 					dispatchbool = False
+					cyclecounter += 1
 				else:
 					dispatchbool = True
 	
@@ -161,13 +161,13 @@ def main():
 				print ("DEBUG listLength of issueQ = " + str(len(issueQ)) + " Cycle number = " + str(cyclecounter))
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
-			cyclecounter += 1
+			#cyclecounter += 1
 			lcounter += 1
 			durationcounter += 1 # duration should be here as well as in the outside loop, because we are measuring 
 									# how long we are here executing.
 
 		dispatchbool = True #reset dispatchbool
-		#cyclecounter -= 1 # advance the cycle.
+		cyclecounter += 1 # advance the cycle.
 		# END while ROB
 
 	FinalStateOfInstructions.WriteToFile("output.txt")		
