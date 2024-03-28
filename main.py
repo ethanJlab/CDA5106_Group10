@@ -95,15 +95,19 @@ def main():
 
 	while ROB or DispatchQ or issueQ or executeQ: #do
 		durationcounter = 0
+		# From the execute_list, check for instructions that are finishing
 		while executeQ: 
 			schdInst = executeQ.pop(0)
 			print_schdInst("Debug Pop executeQ: ", schdInst)
 			schdInst.setCurrentState(5, cyclecounter, durationcounter)
+			# TODO: Update the register file state (ready flag) and wakeup
+			# TODO: set the operand ready flag of dependent instructions
 			FinalStateOfInstructions.addtolist(schdInst.copy())
 			durationcounter += 1
 			#cyclecounter += 1
 		# Scan the READY instructions and issue up to N+1 of them						
 		while issueQ and len(executeQ) < maxScheduleQSize + 1:
+			# TODO: only opperands that are "ready" should be added here
 			schdInst = issueQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
@@ -115,6 +119,7 @@ def main():
 		if DispatchQ:
 			dcounter = 0
 			while dcounter < len(DispatchQ) and len(issueQ) <= maxScheduleQSize:
+				# TODO: fix, dont include instructions in the IF state to the list
 				schdInst = DispatchQ.pop(dcounter)
 				if schdInst.getCurrentState().getexecutionstate() == "IF":
 					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
@@ -124,7 +129,9 @@ def main():
 				else:
 					schdInst.setCurrentState(3, cyclecounter, durationcounter) # else assign IS state
 					print_schdInst("DEBUG Pop DispatchQ IS state: ", schdInst)
-					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue					
+					issueQ.append(schdInst.copy()) # place modified instruction in IS state Queue
+					# TODO:	Rename source operands by looking up state in the register file
+					# and rename destination by updating state in the register file
 	
 				durationcounter += 1 # increment duration again, because we are still doing stuff
 				
@@ -150,7 +157,7 @@ def main():
 				
 				# the maximum amount of instructions that can be dispatched in one cycle is n + 1
 				# Max length of DispatchQ is 2n			
-				if lcounter >= maxDispatch or len(DispatchQ) >= maxDispatch:
+				if lcounter >= maxDispatch or len(DispatchQ) >= 2*maxDispatch:
 					dispatchbool = False
 					cyclecounter += 1
 				else:
