@@ -15,6 +15,10 @@ class instruction(object):
 		self.ISstate = state(0, 0, 0)
 		self.EXstate = state(0, 0, 0)
 		self.WBstate = state(0, 0, 0)
+		self.operandState = False # True if operands are ready, False if operands are not ready
+
+	def setoperandState(self, value):
+		self.operandState = value
 
 	def copy(self):
 		return copy.deepcopy(self)

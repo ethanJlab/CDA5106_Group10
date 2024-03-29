@@ -100,20 +100,36 @@ def main():
 			schdInst = executeQ.pop(0)
 			print_schdInst("Debug Pop executeQ: ", schdInst)
 			schdInst.setCurrentState(5, cyclecounter, durationcounter)
-			# TODO: Update the register file state (ready flag) and wakeup
+
+			# TODO: Update the register file state (ready flag) and wakeup dependent instructions
+			
+			# Which register files need to be updated?
+			registers.set_ready_flag(schdInst.dst)
+
 			# TODO: set the operand ready flag of dependent instructions
+			for inst in issueQ:
+				if inst.src1 == schdInst.dst:
+					inst.setoperandState(True)
+				if inst.src2 == schdInst.dst:
+					inst.setoperandState(True)
+			
+
 			FinalStateOfInstructions.addtolist(schdInst.copy())
 			durationcounter += 1
-			#cyclecounter += 1
-		# Scan the READY instructions and issue up to N+1 of them						
-		while issueQ and len(executeQ) < maxScheduleQSize + 1:
-			# TODO: only opperands that are "ready" should be added here
-			schdInst = issueQ.pop(0)
+
+		# Scan the READY instructions 
+		# TODO: only opperands that are "ready" should be added here
+		tempQ = list()
+		for inst in issueQ:
+			if inst.operandState:
+				tempQ.append(issueQ.pop(0))	
+		# issue up to N+1 of them					
+		while tempQ and len(executeQ) < maxScheduleQSize + 1:			
+			schdInst = tempQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
 			durationcounter += 1
-			executeQ.append(schdInst.copy()) #place in execute Q
-		#cyclecounter += 1
+			executeQ.append(schdInst.copy())
 
 		#the DispatchQ is a list of instruction objects in IF or ID state.
 		if DispatchQ:
@@ -167,6 +183,8 @@ def main():
 				print ("nothing to pop from ROB")
 				print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
 				print ("DEBUG listLength of issueQ = " + str(len(issueQ)) + " Cycle number = " + str(cyclecounter))
+				for inst in issueQ:
+					print_schdInst("DEBUG issueQ: ", inst)
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
 			#cyclecounter += 1
