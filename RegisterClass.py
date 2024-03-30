@@ -2,7 +2,7 @@ class Register:
     def __init__(self):
         # Initialize 128 registers, all set to zero initially
         self.registers = [0 for _ in range(128)]
-        self.readyFlags = [False for _ in range(128)]
+        self.readyFlags = [True for _ in range(128)]
 
     def set_value(self, reg_num, value):
         # Set the value of a register
@@ -42,5 +42,15 @@ class Register:
         reg_num = int(reg_num)
         if 0 <= reg_num < 128:
             self.readyFlags[reg_num] = False
+        else:
+            raise ValueError("Register number out of range")
+    def is_ready(self, reg_num):
+        # if the value is "-1" then there is no register to check
+        if reg_num == "-1":
+            return True
+        # Check if the register is ready
+        reg_num = int(reg_num)
+        if 0 <= reg_num < 128:
+            return self.readyFlags[reg_num]
         else:
             raise ValueError("Register number out of range")
