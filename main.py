@@ -122,7 +122,7 @@ def main():
 		# TODO: only opperands that are "ready" should be added here
 		# FIXME: The infinite loop issue may lie here
 		tempQ = list()
-		# used for testing purposes
+		# used for testing purposes (to keep the sim in a working state)
 		useTempQ = False
 		for inst in issueQ:
 			if inst.operandFlag:
