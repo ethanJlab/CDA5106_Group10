@@ -31,6 +31,7 @@ class Register:
     
     def set_ready_flag(self, reg_num):
         # Set the ready flag for a register
+        reg_num = int(reg_num)
         if 0 <= reg_num < 128:
             self.readyFlags[reg_num] = True
         else:
@@ -38,6 +39,7 @@ class Register:
         
     def reset_ready_flag(self, reg_num):
         # Reset the ready flag for a register
+        reg_num = int(reg_num)
         if 0 <= reg_num < 128:
             self.readyFlags[reg_num] = False
         else:

@@ -104,7 +104,10 @@ def main():
 			# TODO: Update the register file state (ready flag) and wakeup dependent instructions
 			
 			# Which register files need to be updated?
-			registers.set_ready_flag(schdInst.dst)
+			if schdInst.dst != "-1":
+				registers.set_ready_flag(schdInst.dst)
+			else: 
+				schdInst.setoperandState(True)
 
 			# TODO: set the operand ready flag of dependent instructions
 			for inst in issueQ:
@@ -119,13 +122,14 @@ def main():
 
 		# Scan the READY instructions 
 		# TODO: only opperands that are "ready" should be added here
+		# FIXME: The infinite loop issue lies here, it relates to no properly handeling -1 register values
 		tempQ = list()
 		for inst in issueQ:
 			if inst.operandState:
 				tempQ.append(issueQ.pop(0))	
 		# issue up to N+1 of them					
-		while tempQ and len(executeQ) < maxScheduleQSize + 1:			
-			schdInst = tempQ.pop(0)
+		while issueQ and len(executeQ) < maxScheduleQSize + 1:			
+			schdInst = issueQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
 			durationcounter += 1
