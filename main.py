@@ -105,16 +105,14 @@ def main():
 			
 			# Which register files need to be updated?
 			if schdInst.dst != "-1":
+				# set the destination register to ready
 				registers.set_ready_flag(schdInst.dst)
-			else: 
-				schdInst.setoperandState(True)
 
-			# TODO: set the operand ready flag of dependent instructions
+			# set the operand ready flag of dependent instructions (wakeup dependent instructions)
 			for inst in issueQ:
-				if inst.src1 == schdInst.dst:
-					inst.setoperandState(True)
-				if inst.src2 == schdInst.dst:
-					inst.setoperandState(True)
+				# any other instruction that is dependent on the destination register of the current instruction
+				if registers.is_ready(inst.src1) and registers.is_ready(inst.src2):
+					inst.setoperandFlag(True)
 			
 
 			FinalStateOfInstructions.addtolist(schdInst.copy())
@@ -122,14 +120,17 @@ def main():
 
 		# Scan the READY instructions 
 		# TODO: only opperands that are "ready" should be added here
-		# FIXME: The infinite loop issue lies here, it relates to no properly handeling -1 register values
+		# FIXME: The infinite loop issue may lie here
 		tempQ = list()
+		# used for testing purposes
+		useTempQ = False
 		for inst in issueQ:
-			if inst.operandState:
-				tempQ.append(issueQ.pop(0))	
+			if inst.operandFlag:
+				tempQ.append(issueQ.pop(0))
+
 		# issue up to N+1 of them					
-		while issueQ and len(executeQ) < maxScheduleQSize + 1:			
-			schdInst = issueQ.pop(0)
+		while (tempQ if useTempQ else issueQ) and len(executeQ) < maxScheduleQSize + 1:			
+			schdInst = (tempQ if useTempQ else issueQ).pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
 			durationcounter += 1
@@ -139,11 +140,11 @@ def main():
 		if DispatchQ:
 			dcounter = 0
 			while dcounter < len(DispatchQ) and len(issueQ) <= maxScheduleQSize:
-				# TODO: fix, dont include instructions in the IF state to the list
 				schdInst = DispatchQ.pop(dcounter)
 				if schdInst.getCurrentState().getexecutionstate() == "IF":
 					schdInst.setCurrentState(2, cyclecounter, durationcounter) # assign ID state
 					print_schdInst("DEBUG Pop DispatchQ: ", schdInst)
+					# this models the 1 cycle latency
 					DispatchQ.insert(dcounter, schdInst.copy()) # and place it back
 					dcounter += 1
 				else:
@@ -187,8 +188,9 @@ def main():
 				print ("nothing to pop from ROB")
 				print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
 				print ("DEBUG listLength of issueQ = " + str(len(issueQ)) + " Cycle number = " + str(cyclecounter))
-				for inst in issueQ:
-					print_schdInst("DEBUG issueQ: ", inst)
+				print("inf here")
+				for inst in DispatchQ:
+					print_schdInst("DEBUG DispatchQ: ", inst)
 				break # once ROB is empty, this is the "while" part of the do .. while
 			
 			#cyclecounter += 1
