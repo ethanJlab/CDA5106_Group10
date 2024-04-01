@@ -101,9 +101,7 @@ def main():
 			print_schdInst("Debug Pop executeQ: ", schdInst)
 			schdInst.setCurrentState(5, cyclecounter, durationcounter)
 
-			# TODO: Update the register file state (ready flag) and wakeup dependent instructions
-			
-			# Which register files need to be updated?
+			# Update the register file state (ready flag) and wakeup dependent instructions
 			if schdInst.dst != "-1":
 				# set the destination register to ready
 				registers.set_ready_flag(schdInst.dst)
@@ -119,18 +117,18 @@ def main():
 			durationcounter += 1
 
 		# Scan the READY instructions 
-		# TODO: only opperands that are "ready" should be added here
-		# FIXME: The infinite loop issue may lie here
+		# only opperands that are "ready" should be added here
 		tempQ = list()
-		# used for testing purposes (to keep the sim in a working state)
-		useTempQ = False
+		
 		for inst in issueQ:
-			if inst.operandFlag:
-				tempQ.append(issueQ.pop(0))
+			if registers.is_ready(inst.src1) and registers.is_ready(inst.src2):
+				# Move the instruction from issueQ to tempQ for execution
+				tempQ.append(inst)
+				issueQ.remove(inst)  # Safely remove the instruction from issueQ
 
 		# issue up to N+1 of them					
-		while (tempQ if useTempQ else issueQ) and len(executeQ) < maxScheduleQSize + 1:			
-			schdInst = (tempQ if useTempQ else issueQ).pop(0)
+		while tempQ and len(executeQ) < maxScheduleQSize + 1:			
+			schdInst = tempQ.pop(0)
 			print_schdInst("DEBUG Pop issueQ: ", schdInst)
 			schdInst.setCurrentState(4, cyclecounter, durationcounter)
 			durationcounter += 1
@@ -155,7 +153,6 @@ def main():
 					# and rename destination by updating state in the register file
 	
 				durationcounter += 1 # increment duration again, because we are still doing stuff
-				
 		else:
 			print ("DispatchQ is currently empty at cycle " + str(cyclecounter))
 			print ("DEBUG listLength of DispatchQ = " + str(len(DispatchQ)) + " Cycle number = " + str(cyclecounter))
@@ -168,6 +165,7 @@ def main():
 				schdInst.setCurrentState(1, cyclecounter, lcounter) # set to the IF state
 				DispatchQ.append(schdInst.copy()) # place modified instruction in DispatchQ
 
+				# TODO: check to make sure this is being done correctly, count is close but still slightly off
 				# The operation type of an instruction indicates its execution latency
 				if schdInst.getopt() == "0": # Type 0 has a latency of 1 cycle
 					lcounter += 1
