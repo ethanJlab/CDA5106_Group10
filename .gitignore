@@ -160,3 +160,7 @@ cython_debug/
 #.idea/
 
 MachineProblem3_Spring2024/*
+.vscode/
+traces/
+validation_runs/
+results/
