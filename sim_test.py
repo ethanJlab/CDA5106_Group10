@@ -11,6 +11,7 @@ class State:
 register1 = [-1] * 128 # -1 indicates register is ready
 register2 = [-1] * 128 # -1 indicates register is ready
 shared_register = [-1] * 128 # -1 indicates register is ready
+# TODO: this should be a table
 registerTracker = []
 
 
