@@ -11,11 +11,13 @@ class Instruction:
     OP_TYPE_LATENCY = {
         0: 1,
         1: 2,
-        2: 5 
+        2: 5,
+        3: 5,
+        4: 10
     }
     def __init__(self, pc, op_type, src1, src2, dest, tag):
 
-        assert op_type in [0,1,2], "Invalid op_type"
+        assert op_type in [0,1,2,3,4], "Invalid op_type"
 
         self.pc = pc
         self.op_type = op_type
