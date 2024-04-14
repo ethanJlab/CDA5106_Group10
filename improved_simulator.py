@@ -13,6 +13,7 @@ threadTracker = [False] * numThreads
 def onMerge(register):
         global threadTracker,shared_register
         for i in range(len(threadTracker)):
+            # check if thread is active
             if threadTracker[i] == True:
                 # merge active branch into physical register file
                 shared_register = register
@@ -21,7 +22,7 @@ def onMerge(register):
 def onConditional():
         global threadTracker
         for i in range(len(threadTracker)):
-            # set thread as active
+            # set thread as active for convergent / divergent paths
             threadTracker[i] = True
             # print(threadTracker[i])
     
