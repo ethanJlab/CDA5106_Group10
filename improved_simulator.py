@@ -1,33 +1,11 @@
 import sys
 
-# Todo remove multi threading
-from threading import Thread
-
-# TODO: take the psudo code that Sam posted in additional resources and turn that into trace file code
-# there will be explicit instructions for merging
-# need to add instruction for conditionals
-
-# TODO: need to add handeling
-
-# assumption: only one thread is active at a time
-#TODO: On merge: merge acive branch into physical register file
-
 class State:
-    IF = "IF"
+    IF = 'IF'
     ID = "ID"
     IS = "IS"
     EX = "EX"
     WB = "WB"
-
-register1 = [-1] * 128 # -1 indicates register is ready
-register2 = [-1] * 128 # -1 indicates register is ready
-
-# this is the physical register file
-shared_register = [-1] * 128 # -1 indicates register is ready
-
-# TODO: this should be a table
-# add a flag for each thread to indicate which threads are active based on convergent / divergent paths (masking)
-registerTracker = []
 
 class Instruction:
     OP_TYPE_LATENCY = {
@@ -64,7 +42,7 @@ class Instruction:
 
 class Simulator:
 
-    def __init__(self, scheduling_queue_size=2, fetch_size=8, filename="val_trace_gcc.dat", register_group=1):
+    def __init__(self, scheduling_queue_size=2, fetch_size=8, filename="val_trace_gcc.dat"):
         
         scheduling_queue_size = int(scheduling_queue_size)
         fetch_size = int(fetch_size)
@@ -77,9 +55,7 @@ class Simulator:
         self.scheduling_queue_size = scheduling_queue_size # reservation station size
         self.dispatch_queue_size = 2 * fetch_size
         self.fetch_size = fetch_size
-        #self.register = [-1] * 128 # -1 indicates register is ready
-        self.register = register1 if register_group == 1 else register2
-        self.register_group = register_group
+        self.register = [-1] * 128 # -1 indicates register is ready
         self.cycle_counter = 0
         self.instruction_counter = 0
         self.fu = [-1] * (fetch_size + 1) # functional units, -1 indicates free
@@ -92,8 +68,7 @@ class Simulator:
             instruction = self.rob.pop(0)
             # since we are faking the rob, we don't need to update 
             # the register state when instruction is retired from ROB
-            self.register[instruction.dest] = -1
-            registerTracker.append(str(instruction.dest) + "->" + str(instruction.dest) + " in group " + str(self.register_group))
+            # self.register[instruction.dest] = -1
             print(f"{instruction.tag} " +
                   f"fu{{{instruction.op_type}}} src{{{instruction.orig_src1},{instruction.orig_src2}}} dst{{{instruction.dest}}} " +
                   f"IF{{{instruction.IF[0]},{instruction.IF[1]}}} ID{{{instruction.ID[0]},{instruction.ID[1]}}} IS{{{instruction.IS[0]},{instruction.IS[1]}}} " +
@@ -113,7 +88,6 @@ class Simulator:
                 # so check if this instruction is the latest one to write to the register
                 if self.register[instruction.dest] == instruction.tag:
                     self.register[instruction.dest] = -1
-                    registerTracker.append(str(instruction.dest) + "->" + str(instruction.dest) + " in group " + str(self.register_group))
                 
                 # broadcast source operand ready in the issue list
                 for instr in self.issue_list:
@@ -183,7 +157,6 @@ class Simulator:
                 instruction.src2 = self.register[instruction.src2]
             if instruction.dest != -1:
                 self.register[instruction.dest] = instruction.tag  
-                registerTracker.append(str(instruction.tag) + "->" + str(instruction.dest) + " in group " + str(self.register_group))
             
         self.dispatch_list = id_instructions + if_instructions
         for instr in self.dispatch_list:
@@ -216,17 +189,8 @@ class Simulator:
         print(f"number of instructions = {self.instruction_counter}")
         print(f"number of cycles       = {self.cycle_counter}")
         print(f"IPC                    = {self.instruction_counter / self.cycle_counter:.5f}")
-        print(registerTracker)
 
 if __name__ == '__main__':
 
-    simulator1 = Simulator(*sys.argv[1:], 1)
-    simulator2 = Simulator(*sys.argv[1:], 2)
-    t1 = Thread(target=simulator1.run)
-    t2 = Thread(target=simulator2.run)
-
-    t1.start()
-    t2.start()
-
-    t1.join()
-    t2.join()
+    simulator = Simulator(*sys.argv[1:])
+    simulator.run()

@@ -1,0 +1,63 @@
+// 0 is add 1 to dist, 1 is add, 2 is sub,
+// 3 is a conditional branch, if src1 and src2 are equal, jump to instruction denoted by dest
+// 4 is a merge, merge acive branches denoted by the registerTracker into the physical register
+
+// psudo code
+a = [1,2,3,4] # T1 T2 T3 T4
+# 
+for i in a:
+    if i < 2:
+        i += 1
+
+# T1: ADD a1, r1, 1 
+# T2: Inactive
+# T3: Inactive
+# T4: Inactive
+
+// a = [1,2,3,4] # T1 T2 T3 T4
+
+// register 1 will have a[0]
+10 0 1 -1 -1
+
+// register 2 will have a[1]
+11 0 2 -1 -1
+12 0 2 -1 -1
+
+// register 3 will have a[2]
+12 0 3 -1 -1
+13 0 3 -1 -1
+14 0 3 -1 -1
+
+// register 4 will have a[3]
+15 0 4 -1 -1
+16 0 4 -1 -1
+17 0 4 -1 -1
+18 0 4 -1 -1
+
+// register 5 will have the size of a (4)
+19 0 5 -1 -1
+20 0 5 -1 -1
+21 0 5 -1 -1
+22 0 5 -1 -1
+
+// register 6 will be used to count the number of times the loop has run
+
+//regist 1 is a
+//register 2 is i
+
+// eval a[0]
+23 3 1 1 1 // True since i < 2
+
+// instruction to go to if the if his T
+//eval a[1]
+1 0 2 -1 -1
+2 3 2 1 1 // True since i < 2
+
+//eval a[2]
+3 0 3 4 5 // False since i > 2
+
+//eval a[3]
+4 0 4 4 5 // False since i > 2
+
+// end of loop so merge active registers
+5 4 -1 -1 -1
