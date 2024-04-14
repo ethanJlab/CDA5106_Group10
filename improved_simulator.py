@@ -12,22 +12,18 @@ threadTracker = [False] * numThreads
 # helper functions for thread tracker
 def onMerge(register):
         global threadTracker,shared_register
-        print("Merge Thread Tracker")
         for i in range(len(threadTracker)):
             if threadTracker[i] == True:
                 # merge active branch into physical register file
                 shared_register = register
                 break
-        print("")
     
 def onConditional():
         global threadTracker
-        print("Thread Tracker")
         for i in range(len(threadTracker)):
             # set thread as active
             threadTracker[i] = True
-            print(threadTracker[i])
-        print("")
+            # print(threadTracker[i])
     
 # function
 
