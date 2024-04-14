@@ -1,5 +1,36 @@
 import sys
 
+# this is the physical register file
+shared_register = [-1] * 128 # -1 indicates register is ready
+
+# number of threads
+numThreads = 4
+
+# add a flag for each thread to indicate which threads are active based on convergent / divergent paths (masking)
+threadTracker = [False] * numThreads
+
+# helper functions for thread tracker
+def onMerge(register):
+        global threadTracker,shared_register
+        print("Merge Thread Tracker")
+        for i in range(len(threadTracker)):
+            if threadTracker[i] == True:
+                # merge active branch into physical register file
+                shared_register = register
+                break
+        print("")
+    
+def onConditional():
+        global threadTracker
+        print("Thread Tracker")
+        for i in range(len(threadTracker)):
+            # set thread as active
+            threadTracker[i] = True
+            print(threadTracker[i])
+        print("")
+    
+# function
+
 class State:
     IF = 'IF'
     ID = "ID"
@@ -80,6 +111,8 @@ class Simulator:
         unfinished_instructions = []
         for instruction in self.execute_list:
 
+           
+
             instruction.latency -= 1
 
             if instruction.latency == 0:
@@ -97,6 +130,22 @@ class Simulator:
                         instr.src1 = -1
                     if instr.src2 == instruction.tag:
                         instr.src2 = -1
+                
+                 # execute merge / conditional here?
+                if instruction.op_type == 3:
+                    onConditional()
+                elif instruction.op_type == 4:
+                    onMerge(self.register)
+                else:
+                    # we deactive all 'wrong' threads
+                    # pick random thread to be active
+                    for i in range(len(threadTracker)):
+                        if i == 0:
+                            threadTracker[i] = True
+                        else:
+                            threadTracker[i] = False
+
+
             else:
                 instruction.EX = (instruction.EX[0], instruction.EX[1] + 1)
                 unfinished_instructions.append(instruction)
@@ -192,6 +241,7 @@ class Simulator:
         print(f"number of cycles       = {self.cycle_counter}")
         print(f"IPC                    = {self.instruction_counter / self.cycle_counter:.5f}")
 
+    
 if __name__ == '__main__':
 
     simulator = Simulator(*sys.argv[1:])

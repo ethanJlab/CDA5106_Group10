@@ -27,7 +27,7 @@ shared_register = [-1] * 128 # -1 indicates register is ready
 
 # TODO: this should be a table
 # add a flag for each thread to indicate which threads are active based on convergent / divergent paths (masking)
-registerTracker = []
+threadTracker = [0] * 
 
 class Instruction:
     OP_TYPE_LATENCY = {
