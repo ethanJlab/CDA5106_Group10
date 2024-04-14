@@ -9,7 +9,7 @@ numThreads = 4
 # add a flag for each thread to indicate which threads are active based on convergent / divergent paths (masking)
 threadTracker = [False] * numThreads
 
-# helper functions for thread tracker
+# when a merge instruction is executed, we need to merge the active branch into the physical register file
 def onMerge(register):
         global threadTracker,shared_register
         for i in range(len(threadTracker)):
@@ -18,15 +18,14 @@ def onMerge(register):
                 # merge active branch into physical register file
                 shared_register = register
                 break
-    
+
+# in the case of a conditional branch, all threads are working on the branches
 def onConditional():
         global threadTracker
         for i in range(len(threadTracker)):
             # set thread as active for convergent / divergent paths
             threadTracker[i] = True
             # print(threadTracker[i])
-    
-# function
 
 class State:
     IF = 'IF'
@@ -137,6 +136,7 @@ class Simulator:
                     # we deactive all 'wrong' threads
                     # pick random thread to be active
                     for i in range(len(threadTracker)):
+                        # After conditional branch, we need to set the thread on the correct branch to be active and the rest to be inactive
                         if i == 0:
                             threadTracker[i] = True
                         else:
