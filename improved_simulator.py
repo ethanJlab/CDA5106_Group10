@@ -25,7 +25,6 @@ def onConditional():
         for i in range(len(threadTracker)):
             # set thread as active for convergent / divergent paths
             threadTracker[i] = True
-            # print(threadTracker[i])
 
 class State:
     IF = 'IF'
@@ -62,20 +61,16 @@ class Instruction:
         self.IF = self.ID = self.IS = self.EX = self.WB = (None, 1) # (cycle, duration)
 
     def operands_are_ready(self):
-
         return self.src1 == -1 and self.src2 == -1
         
     def __repr__(self) -> str:
         return f"Inst(tag[{self.tag}] op[{self.op_type}] s1[{self.src1}] s2[{self.src2}] d[{self.dest}] lat[{self.latency}] st[{self.state}] IF[{self.IF}] ID[{self.ID}] IS[{self.IS}] EX[{self.EX}] WB[{self.WB}]"
 
-
 class Simulator:
 
     def __init__(self, scheduling_queue_size=2, fetch_size=8, filename="val_trace_gcc.dat"):
-        
         scheduling_queue_size = int(scheduling_queue_size)
         fetch_size = int(fetch_size)
-
         self.dispatch_list = [] # 2 * issue_queue_size
         self.issue_list = []
         self.filename = filename
@@ -88,7 +83,6 @@ class Simulator:
         self.cycle_counter = 0
         self.instruction_counter = 0
         self.fu = [-1] * (fetch_size + 1) # functional units, -1 indicates free
-
         self.instruction_generator = self.read_next_instruction()
         self.is_end_of_trace_file = False
 
@@ -106,8 +100,6 @@ class Simulator:
     def execute(self):
         unfinished_instructions = []
         for instruction in self.execute_list:
-
-           
 
             instruction.latency -= 1
 
@@ -141,7 +133,6 @@ class Simulator:
                             threadTracker[i] = True
                         else:
                             threadTracker[i] = False
-
 
             else:
                 instruction.EX = (instruction.EX[0], instruction.EX[1] + 1)
@@ -237,9 +228,7 @@ class Simulator:
         print(f"number of instructions = {self.instruction_counter}")
         print(f"number of cycles       = {self.cycle_counter}")
         print(f"IPC                    = {self.instruction_counter / self.cycle_counter:.5f}")
-
     
 if __name__ == '__main__':
-
     simulator = Simulator(*sys.argv[1:])
     simulator.run()
