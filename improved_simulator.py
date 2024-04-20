@@ -119,7 +119,6 @@ class Simulator:
                     if instr.src2 == instruction.tag:
                         instr.src2 = -1
                 
-                 # execute merge / conditional here?
                 if instruction.op_type == 3:
                     onConditional()
                 elif instruction.op_type == 4:
